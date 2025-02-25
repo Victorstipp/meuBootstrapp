@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Busca de Usuários</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .spinner {
+            border: 4px solid #f3f3f3; 
+            border-top: 4px solid #3498db; 
+               border-radius: 50%; 
+            width: 50px;
+              height: 50px;
+            animation: spin 2s linear infinite; 
+            margin: 20px auto; 
+            display: none; 
+        }
+
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+             100% { transform: rotate(360deg); }
+        }
+
+
+        .card {
+            width: 100%; 
+              margin-bottom: 20px;
+            text-align: center; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            transition: transform 0.3s, box-shadow 0.3s; 
+        }
+
+       
+        .card:hover {
+              transform: translateY(-10px); 
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+          } 
+
+        .btn-custom   {
+              background-color: #28a745;
+              color: white;
+          }
+
+        .btn-custom:hover {
+            background-color: #218838;
+        }
+
+       
+        h5.card-title {
+            font-size: 1.3rem; 
+            font-weight: bold;
+        }
+
+        .card-text {
+            font-size: 1rem; 
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h2 class="text-center mb-4">🔍 Buscar Usuário</h2>
+        
+        
+        <div class="input-group mb-3">
+            <input type="number" id="userId" class="form-control" placeholder="Digite o ID do usuário (1 a 10)">
+            <button id="searchButton" class="btn btn-primary">Buscar</button>
+            <button id="clearButton" class="btn btn-danger ms-2">Limpar</button>
+        </div>
+
+        
+        <div id="userInfo" class="row mt-4"></div>
+
+        
+        <div id="loadingSpinner" class="spinner"></div>
+    </div>
+
+    <script>
+        document.getElementById("searchButton").addEventListener("click", function() {
+            let userId = document.getElementById("userId").value;
+            document.getElementById("loadingSpinner").style.display = 'block';
+
+            if (!userId || userId < 1 || userId > 10) {
+                document.getElementById("userInfo").innerHTML = `<div class="alert alert-warning">Digite um ID válido entre 1 e 10.</div>`;
+                document.getElementById("loadingSpinner").style.display = 'none';
+                return;
+            }
+
+            fetch(`https://jsonplaceholder.typicode.com/users/${userId}`)
+                .then(response => response.json())
+                .then(user => {
+          
+                    document.getElementById("loadingSpinner").style.display = 'none';
+
+                    document.getElementById("userInfo").innerHTML += `
+                        <div class="col-md-3"> <!-- Definindo que cada card ocupará 3 colunas (4 por linha) -->
+                            <div class="card">
+                                <div class="card-body">
+                                     <h5 class="card-title">${user.name}</h5>
+                                    <p class="card-text"><strong>Email:</strong> ${user.email}</p>
+                                        <p class="card-text"><strong>Telefone:</strong> ${user.phone}</p>
+                                        <p class="card-text"><strong>Website:</strong> ${user.website}</p>
+                                         <p class="card-text"><strong>Empresa:</strong> ${user.company.name}</p>
+                                        <p class="card-text"><strong>Frase da Empresa:</strong> ${user.company.catchPhrase}</p>
+                                      <p class="card-text"><strong>Descrição da Empresa:</strong> ${user.company.bs}</p>
+                                      <p class="card-text"><strong>Endereço:</strong></p>
+                                    <ul class="list-unstyled">
+                                            <li><strong>Rua:</strong> ${user.address.street}</li>
+                                           <li><strong>Suite:</strong> ${user.address.suite}</li>
+                                             <li><strong>Cidade:</strong> ${user.address.city}</li>
+                                        <li><strong>CEP:</strong> ${user.address.zipcode}</li>
+                                          <li><strong>Coordenadas:</strong> Lat: ${user.address.geo.lat}, Lng: ${user.address.geo.lng}</li>
+                                     </ul>
+                                 </div>
+                             </div>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    
+                    document.getElementById("loadingSpinner").style.display = 'none';
+
+                    
+                    document.getElementById("userInfo").innerHTML = `
+                        <div class="alert alert-danger">Usuário não encontrado!</div>
+                    `;
+                });
+        });
+
+        
+        document.getElementById("clearButton").addEventListener("click", function() {
+            document.getElementById("userInfo").innerHTML = '';
+             document.getElementById("userId").value = '';
+            document.getElementById("loadingSpinner").style.display = 'none';
+        });
+    </script>
+</body>
+</html>
